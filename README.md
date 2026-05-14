@@ -1,16 +1,23 @@
 # AI Code Review Sentinel
 
-AI-first code review guardrail for remote engineering teams.
+AI-first code review guardrails for remote engineering teams that want faster, more consistent review notes without handing all judgment to a model.
 
-The CLI reviews a unified git diff and returns structured findings. It works in
-two modes:
+The CLI reads a unified git diff and returns structured findings. It has two layers: deterministic risk scanning that needs no API key, and optional OpenAI-compatible LLM review when `OPENAI_API_KEY` is configured.
 
-- deterministic rule scan, no API key required
-- optional OpenAI-compatible LLM review when `OPENAI_API_KEY` is configured
+## Problem
 
-The goal is not to replace human review. The goal is to catch risky changes
-early, produce consistent review notes, and give an AI reviewer a safe,
-structured boundary.
+Code review automation becomes risky when every finding depends on a model. The useful pattern is to keep deterministic checks for known hazards, then let an LLM add context only inside a controlled review boundary.
+
+This project demonstrates that split: predictable rules for common backend/security risks, optional AI review for explanation and prioritization, and Markdown or JSON output for humans, agents, or CI jobs.
+
+## What It Demonstrates
+
+- Deterministic scanning of unified git diffs
+- Optional OpenAI-compatible review layer
+- Markdown output for pull request comments
+- JSON output for agents and CI consumption
+- Checks for secrets, shell execution, SQL concatenation, auth bypasses, unsafe TLS, unsafe deserialization, prompt-injection-sensitive paths, and risky backend changes without tests
+- A small review surface that can be inspected, extended, and wired into team workflows
 
 ## Quick Start
 
@@ -41,28 +48,31 @@ OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=gpt-4.1-mini
 ```
 
-## Checks
+## Output Modes
 
-- hardcoded secrets and private keys
-- shell execution and process spawning
-- raw SQL string concatenation
-- auth bypass and debug backdoors
-- disabled TLS or certificate verification
-- unsafe deserialization
-- prompt-injection sensitive code paths
-- missing tests for risky backend changes
+- Default: Markdown findings suitable for PR comments
+- `--json`: structured findings for agents, dashboards, or CI gates
+- `--ai`: deterministic scan plus optional LLM review
 
-## Output
+## Where This Fits
 
-Default output is Markdown for pull request comments. Use `--json` for agent or
-CI consumption.
+This pattern is useful for teams that need lightweight engineering quality gates:
 
-```bash
-node src/review.mjs examples/sample.diff --json
-```
+- Remote teams that want consistent first-pass review notes
+- Small teams without a dedicated security reviewer on every PR
+- CI checks for risky backend or automation changes
+- AI-assisted review workflows where deterministic guardrails should run before model commentary
+- Internal agent workflows that need machine-readable risk findings
 
-## Why This Exists
+## Extension Ideas
 
-AI code review is useful only when the model has guardrails. This project keeps
-the deterministic safety checks separate from the optional model call, so teams
-can run the same baseline checks in CI and use LLM review as an additional layer.
+- Add repository-specific rule packs
+- Add severity thresholds for failing CI
+- Add SARIF or GitHub annotations output
+- Add Java/Spring Boot specific checks for risky controller, SQL, auth, and config changes
+- Track findings over time for team quality metrics
+- Combine with an LLM eval harness to test review prompt regressions
+
+## Related Work
+
+This repo is part of my public AI automation portfolio. More context: [GitHub profile](https://github.com/kingberQ) and [LinkedIn](https://www.linkedin.com/in/kingberq/).
