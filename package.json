@@ -1,0 +1,17 @@
+{
+  "name": "ai-code-review-sentinel",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "bin": {
+    "ai-code-review-sentinel": "src/review.mjs"
+  },
+  "scripts": {
+    "demo": "node src/review.mjs examples/sample.diff",
+    "demo:json": "node src/review.mjs examples/sample.diff --json",
+    "test": "node test/review.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
